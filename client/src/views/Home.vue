@@ -3,98 +3,10 @@
     <div class="col-12 mt-2 mb-4">
       <button id='newTaskBtn' class="btn btn-primary" v-on:click='newTaskModal()'>+ New Task</button>
     </div>
-    <div class="col-12 col-md-6 col-xl-3">
-      <div id='backlogHead' class="row bg-info colHead mx-auto">
-        <h4 class="my-2 ml-4">Back-Log</h4>
-      </div>
-      <div class="card mx-auto">
-        <div class="card-body border" v-for='(log, index) in backlog' :key='index'>
-          <h5 class="card-title"><strong>{{ log.title }}</strong></h5>
-          <table class="table card-text text-left ml-2">
-            <tbody>
-              <tr>
-                <th scope="row">Point</th>
-                <td>{{ log.point }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Assigned To</th>
-                <td>{{ log.assignedTo }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="btn btn-primary" v-on:click='showDetail(log,"backlog")'>Show Detail</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-      <div id='todoHead' class="row bg-warning colHead mx-auto">
-        <h4 class="my-2 ml-4">To-Do</h4>
-      </div>
-      <div class="card mx-auto">
-        <div class="card-body border" v-for='(log, index) in todo' :key='index'>
-          <h5 class="card-title"><strong>{{ log.title }}</strong></h5>
-          <table class="table card-text text-left ml-2">
-            <tbody>
-              <tr>
-                <th scope="row">Point</th>
-                <td>{{ log.point }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Assigned To</th>
-                <td>{{ log.assignedTo }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="btn btn-primary" v-on:click='showDetail(log, "todo")'>Show Detail</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-      <div id='doingHead' class="row bg-primary colHead mx-auto">
-        <h4 class="my-2 ml-4">Doing</h4>
-      </div>
-      <div class="card mx-auto">
-        <div class="card-body border" v-for='(log, index) in doing' :key='index'>
-          <h5 class="card-title"><strong>{{ log.title }}</strong></h5>
-          <table class="table card-text text-left ml-2">
-            <tbody>
-              <tr>
-                <th scope="row">Point</th>
-                <td>{{ log.point }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Assigned To</th>
-                <td>{{ log.assignedTo }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="btn btn-primary" v-on:click='showDetail(log, "doing")'>Show Detail</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-6 col-xl-3">
-      <div id='doneHead' class="row bg-success colHead mx-auto">
-        <h4 class="my-2 ml-4">Done</h4>
-      </div>
-      <div class="card mx-auto">
-        <div class="card-body border" v-for='(log, index) in done' :key='index'>
-          <h5 class="card-title"><strong>{{ log.title }}</strong></h5>
-          <table class="table card-text text-left ml-2">
-            <tbody>
-              <tr>
-                <th scope="row">Point</th>
-                <td>{{ log.point }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Assigned To</th>
-                <td>{{ log.assignedTo }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="btn btn-primary" v-on:click='showDetail(log, "done")'>Show Detail</button>
-        </div>
-      </div>
-    </div>
+    <backlogcomp v-bind:backlog='backlog' @showdetail='showDetail'></backlogcomp>
+    <todocomp v-bind:todo='todo' @showdetail='showDetail'></todocomp>
+    <doingcomp v-bind:doing='doing' @showdetail='showDetail'></doingcomp>
+    <donecomp v-bind:done='done' @showdetail='showDetail'></donecomp>
 
     <!-- MODALS -->
     <div id='backdrop' v-if='showBackdrop'></div>
@@ -138,13 +50,13 @@
                 </tr>
               </tbody>
             </table>
-            <button class="btn btn-info" v-on:click='moveTask("backlog")' v-if='detailed.from === "todo"'>Back-Log</button>
-            <button class="btn btn-warning" v-on:click='moveTask("todo")' v-else-if='detailed.from === "doing"'>To-Do</button>
-            <button class="btn btn-primary" v-on:click='moveTask("doing")' v-else-if='detailed.from === "done"'>Doing</button>
+            <button class="btn btn-info" v-on:click='movePrev()' v-if='detailed.from === "todo"'>Back-Log</button>
+            <button class="btn btn-warning" v-on:click='movePrev()' v-else-if='detailed.from === "doing"'>To-Do</button>
+            <button class="btn btn-primary" v-on:click='movePrev()' v-else-if='detailed.from === "done"'>Doing</button>
             <button class="btn btn-danger" v-on:click='deleteTask()'>Delete</button>
-            <button class="btn btn-warning" v-on:click='moveTask("todo")' v-if='detailed.from === "backlog"'>To-Do</button>
-            <button class="btn btn-primary" v-on:click='moveTask("doing")' v-if='detailed.from === "todo"'>Doing</button>
-            <button class="btn btn-success" v-on:click='moveTask("done")' v-else-if='detailed.from === "doing"'>Done</button>
+            <button class="btn btn-warning" v-on:click='moveNext()' v-if='detailed.from === "backlog"'>To-Do</button>
+            <button class="btn btn-primary" v-on:click='moveNext()' v-if='detailed.from === "todo"'>Doing</button>
+            <button class="btn btn-success" v-on:click='moveNext()' v-else-if='detailed.from === "doing"'>Done</button>
             <br><button class="btn btn-danger mt-4" v-on:click='showDetail()'>Close Detail</button>
           </div>
         </div>
@@ -155,9 +67,19 @@
 
 <script>
 import db from '../../config.js'
+import backlogcomp from '@/components/backlog.vue'
+import todocomp from '@/components/todo.vue'
+import doingcomp from '@/components/doing.vue'
+import donecomp from '@/components/done.vue'
 
 export default {
   name: 'home',
+  components: {
+    backlogcomp,
+    todocomp,
+    doingcomp,
+    donecomp
+  },
   data: function () {
     return {
       backlog: [],
@@ -178,74 +100,86 @@ export default {
   },
   methods: {
     getAll: function () {
-      this.getBacklog()
-      this.getTodo()
-      this.getDoing()
-      this.getDone()
+      this.get0()
+      this.get1()
+      this.get2()
+      this.get3()
     },
-    getBacklog: function () {
+    get0: function () {
       this.backlog = []
-      db.ref('backlog').once('value')
+      db.ref('/').once('value')
         .then((snapshot) => {
           let objkey = Object.keys(snapshot.val())
           for (var i = 0; i < objkey.length; i++) {
-            this.backlog.push(snapshot.val()[objkey[i]])
+            if (snapshot.val()[objkey[i]].status === 0) {
+              this.backlog.push(snapshot.val()[objkey[i]])
+            }
           }
         })
         .catch(err => {
           console.log(err)
         })
     },
-    getTodo: function () {
+    get1: function () {
       this.todo = []
-      db.ref('todo').once('value')
+      db.ref('/').once('value')
         .then((snapshot) => {
           let objkey = Object.keys(snapshot.val())
           for (var i = 0; i < objkey.length; i++) {
-            this.todo.push(snapshot.val()[objkey[i]])
+            if (snapshot.val()[objkey[i]].status === 1) {
+              this.todo.push(snapshot.val()[objkey[i]])
+            }
           }
         })
         .catch(err => {
           console.log(err)
         })
     },
-    getDoing: function () {
+    get2: function () {
       this.doing = []
-      db.ref('doing').once('value')
+      db.ref('/').once('value')
         .then((snapshot) => {
           let objkey = Object.keys(snapshot.val())
           for (var i = 0; i < objkey.length; i++) {
-            this.doing.push(snapshot.val()[objkey[i]])
+            if (snapshot.val()[objkey[i]].status === 2) {
+              this.doing.push(snapshot.val()[objkey[i]])
+            }
           }
         })
         .catch(err => {
           console.log(err)
         })
     },
-    getDone: function () {
+    get3: function () {
       this.done = []
-      db.ref('done').once('value')
+      db.ref('/').once('value')
         .then((snapshot) => {
           let objkey = Object.keys(snapshot.val())
           for (var i = 0; i < objkey.length; i++) {
-            this.done.push(snapshot.val()[objkey[i]])
+            if (snapshot.val()[objkey[i]].status === 3) {
+              this.done.push(snapshot.val()[objkey[i]])
+            }
           }
         })
         .catch(err => {
           console.log(err)
         })
     },
-    moveTask: function (dest) {
-      db.ref(`${this.detailed.from}/${this.detailed.key}`).remove()
-      db.ref(`${dest}/${this.detailed.key}`).set({
-        assignedTo: this.detailed.assignedTo,
-        desc: this.detailed.desc,
-        key: this.detailed.key,
-        point: this.detailed.point,
-        title: this.detailed.title
+    movePrev: function (dest) {
+      db.ref(`${this.detailed.key}`).update({
+        status: this.detailed.status - 1
       })
       this.showDetail()
-      this.getAll()
+      this[`get${this.detailed.status}`]()
+      this[`get${this.detailed.status - 1}`]()
+    },
+    moveNext: function (dest) {
+      db.ref(`${this.detailed.key}`).update({
+        status: this.detailed.status + 1
+      })
+      this.showDetail()
+      this[`get${this.detailed.status}`]()
+      this[`get${this.detailed.status + 1}`]()
     },
     newTaskModal: function () {
       if (this.openNTM) {
@@ -271,17 +205,18 @@ export default {
       } else {
         this.noblank = false
         this.pointguard = false
-        db.ref('backlog/').push({
+        db.ref('/').push({
           title: this.newtitle,
           desc: this.newdesc,
           point: this.newpoint,
-          assignedTo: this.newassign
+          assignedTo: this.newassign,
+          status: 0
         })
           .then(snapshot => {
-            db.ref(`backlog/${snapshot.key}`).update({
+            db.ref(`${snapshot.key}`).update({
               key: snapshot.key
             })
-            this.getBacklog()
+            this.get0()
           })
           .catch(err => {
             console.log(err)
@@ -289,10 +224,10 @@ export default {
         this.newTaskModal()
       }
     },
-    showDetail: function (log, from) {
-      if (log) {
-        this.detailed = log
-        this.detailed.from = from
+    showDetail: function (value) {
+      if (value) {
+        this.detailed = value[0]
+        this.detailed.from = value[1]
         this.showBackdrop = true
         this.openDetail = true
       } else {
